@@ -66,7 +66,7 @@ class LR_training:
         dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
         'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
         'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
-        sp500 = #use pandas to open the companies csv
+        sp500 = # use pandas to open the companies csv
         sp = list(sp500['Ticker'])
         stocks = dow + sp[:20]
         self.stocks = list(np.unique(stocks))
@@ -84,7 +84,10 @@ class LR_training:
         self.fit_model()
         self.confusion_matrix()
         self.save_model()
-
+"""
+fetch_data: recupera i dati di addestramento richiamando la funzione create_train_data del modulo stock_utils
+per ogni simbolo ticker.I dati vengono aggiunti al dataframe principale main_df.
+"""
     def fetch_data(self):
         """
         get train and test data
@@ -96,7 +99,10 @@ class LR_training:
             except:
                 pass
         print(f'{len(self.main_df)} samples were fetched from the database..')
-
+"""
+create_train_test: crea i dati di addestramento e test suddividendo il dataframe principale main_df in input (x) e output (y),
+utilizzando train_test_split da sklearn.model_selection.
+"""
     def create_train_test(self):
         """
         create train and test data
@@ -113,7 +119,10 @@ class LR_training:
             test_size = 0.05, random_state = 50, shuffle = True)
 
         print('Created test and train data...')
-
+"""
+fit_model: addestra il modello di regressione logistica utilizzando i dati di addestramento e calcola le previsioni
+sui dati di test. Vengono anche calcolate le previsioni soglia basate sul parametro threshold.
+"""
     def fit_model(self):
 
         print('Training model...')
@@ -127,7 +136,9 @@ class LR_training:
         #preds with threshold
         self.predictions_proba = self.lr._predict_proba_lr(self.test_x)
         self.predictions_proba_thresholded = self._threshold(self.predictions_proba, self.threshold)
-      
+
+#confusion_matrix: calcola le matrici di confusione utilizzando le previsioni del modello sui dati di test.     
+
     def confusion_matrix(self):
         cm = confusion_matrix(self.test_y, self.predictions)
         self.cmd = ConfusionMatrixDisplay(cm)
@@ -135,12 +146,16 @@ class LR_training:
         cm_thresholded = confusion_matrix(self.test_y, self.predictions_proba_thresholded)
         self.cmd_thresholded = ConfusionMatrixDisplay(cm_thresholded)
 
-        
+""" _threshold  prende in input un array di probabilità previste e applica una soglia per ottenere le previsioni
+    soglia corrispondenti. Restituisce un array numpy costituito di 0 o 1 a secondo della soglia.
+"""
     def _threshold(self, predictions, threshold):
 
         prob_thresholded = [0 if x > threshold else 1 for x in predictions[:, 0]]
 
         return np.array(prob_thresholded)
+
+#save_model: salva il modello addestrato e lo scaler utilizzati, insieme alle matrici di confusione, in file specifici.
 
     def save_model(self):
 
