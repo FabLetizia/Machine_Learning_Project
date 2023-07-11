@@ -42,6 +42,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import seaborn as sns
 
+"""
+La classe LR_training rappresenta il processo di addestramento del modello di regressione logistica.
+Nel suo metodo __init__, la classe prende in input diversi parametri:
+model_version: una stringa che rappresenta la versione del modello.
+threshold: un valore di soglia opzionale (predefinito a 0.98) utilizzato per la classificazione binaria
+basata sulle probabilità previste dal modello.
+start_date e end_date: date di inizio e fine opzionali per l'intervallo di dati storici da considerare.
+"""
 class LR_training:
 
     def __init__(self, model_version, threshold = 0.98, start_date = None, end_date = None):
