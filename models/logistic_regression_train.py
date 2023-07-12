@@ -66,7 +66,7 @@ class LR_training:
         dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
         'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
         'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
-        #sp500 = # use pandas to open the companies csv
+        sp500 = # use pandas to open the companies csv
         sp = list(sp500['Ticker'])
         stocks = dow + sp[:20]
         self.stocks = list(np.unique(stocks))
