@@ -241,7 +241,7 @@ def predict_trend(stock, _model_, start_date = None, end_date = None, n = 10):
     #scale the x data
     scaler = MinMaxScaler()
     x = scaler.fit_transform(x)
-
+    #x.shape[0] restituisce la lunghezza del primo asse dell'array
     for i in range(x.shape[0]):
         
         try:
