@@ -13,14 +13,14 @@ import time
 
 def load_LR(model_version):
 
-    file = #add path to the saved models folder and then model version 'eg: f'//saved_models//lr_{model_version}.sav'
+   # file = #add path to the saved models folder and then model version 'eg: f'//saved_models//lr_{model_version}.sav'
     loaded_model = pickle.load(open(file, 'rb'))
 
     return loaded_model
 
 def load_scaler(model_version):
 
-    file = ## add path to //saved_models//scaler_{model_version}.sav'
+    #file = ## add path to //saved_models//scaler_{model_version}.sav'
     loaded_model = pickle.load(open(file, 'rb'))
 
     return loaded_model
