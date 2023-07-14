@@ -5,13 +5,12 @@ authors - Alessandro Pesare, Fabio Letizia
 
 import numpy as np
 from stock_utils.simulator import simulator
-from stock_utils.stock_utils import get_stock_price
-from models import lr_inference
+#from stock_utils.stock_utils import get_stock_price
+from models import logistic_regression_inference
 from datetime import datetime
 from datetime import timedelta
-from td.client import TDClient
 import pandas as pd
-from models.lr_inference import LR_v1_predict, LR_v1_sell
+from models.logistic_regression_inference import LR_v1_predict, LR_v1_sell
 import warnings
 from collections import OrderedDict
 warnings.filterwarnings("ignore")

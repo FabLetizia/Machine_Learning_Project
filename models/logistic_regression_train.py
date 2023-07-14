@@ -8,7 +8,6 @@ requests per effettuare richieste HTTP, matplotlib.pyplot per la visualizzazione
 pandas per la manipolazione dei dati tabulari, pickle per la serializzazione degli oggetti Python, 
 numpy per operazioni matematiche avanzate e sklearn per l'apprendimento automatico.
 """
-from td.client import TDClient
 import requests, time, re, os
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -84,10 +83,10 @@ class LR_training:
         self.fit_model()
         self.confusion_matrix()
         self.save_model()
-"""
-fetch_data: recupera i dati di addestramento richiamando la funzione create_train_data del modulo stock_utils
-per ogni simbolo ticker.I dati vengono aggiunti al dataframe principale main_df."""
-
+        """
+    fetch_data: recupera i dati di addestramento richiamando la funzione create_train_data del modulo stock_utils
+    per ogni simbolo ticker.I dati vengono aggiunti al dataframe principale main_df.
+    """
     def fetch_data(self):
         """
         get train and test data
@@ -99,10 +98,10 @@ per ogni simbolo ticker.I dati vengono aggiunti al dataframe principale main_df.
             except:
                 pass
         print(f'{len(self.main_df)} samples were fetched from the database..')
-"""
-create_train_test: crea i dati di addestramento e test suddividendo il dataframe principale main_df in input (x) e output (y),
-utilizzando train_test_split da sklearn.model_selection.
-"""
+    """
+    create_train_test: crea i dati di addestramento e test suddividendo il dataframe principale main_df in input (x) e output (y),
+    utilizzando train_test_split da sklearn.model_selection.
+    """
     def create_train_test(self):
         """
         create train and test data
@@ -119,10 +118,10 @@ utilizzando train_test_split da sklearn.model_selection.
             test_size = 0.05, random_state = 50, shuffle = True)
 
         print('Created test and train data...')
-"""
-fit_model: addestra il modello di regressione logistica utilizzando i dati di addestramento e calcola le previsioni
-sui dati di test. Vengono anche calcolate le previsioni soglia basate sul parametro threshold.
-"""
+    """
+    fit_model: addestra il modello di regressione logistica utilizzando i dati di addestramento e calcola le previsioni
+    sui dati di test. Vengono anche calcolate le previsioni soglia basate sul parametro threshold.
+    """
     def fit_model(self):
 
         print('Training model...')
@@ -145,10 +144,10 @@ sui dati di test. Vengono anche calcolate le previsioni soglia basate sul parame
         
         cm_thresholded = confusion_matrix(self.test_y, self.predictions_proba_thresholded)
         self.cmd_thresholded = ConfusionMatrixDisplay(cm_thresholded)
-
-""" _threshold  prende in input un array di probabilità previste e applica una soglia per ottenere le previsioni
+    """
+    _threshold  prende in input un array di probabilità previste e applica una soglia per ottenere le previsioni
     soglia corrispondenti. Restituisce un array numpy costituito di 0 o 1 a secondo della soglia.
-"""
+    """
     def _threshold(self, predictions, threshold):
 
         prob_thresholded = [0 if x > threshold else 1 for x in predictions[:, 0]]
