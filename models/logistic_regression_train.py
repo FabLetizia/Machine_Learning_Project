@@ -28,11 +28,11 @@ import os
 import sys
 import pickle
 
-#append path
-current_dir = os.getcwd()
-sys.path.append(current_dir)
+# Aggiungi il percorso della cartella "stock_utils" al percorso di ricerca dei moduli
+stock_utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'stock_utils'))
+sys.path.append(stock_utils_path)
 
-from stock_utils import stock_utils
+from stock_utils_ import stock_utils
 import sklearn 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -65,7 +65,7 @@ class LR_training:
         dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
         'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
         'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
-       # sp500 = # use pandas to open the companies csv
+        sp500 = pd.read_csv('companies.csv')
         sp = list(sp500['Ticker'])
         stocks = dow + sp[:20]
         self.stocks = list(np.unique(stocks))
@@ -184,4 +184,6 @@ class LR_training:
 import argparse
 
 if __name__ == "__main__":
+    stock_utils_path = os.path.abspath("stock_utils.py")
+    print(stock_utils_path)
     run_lr = LR_training('v2')

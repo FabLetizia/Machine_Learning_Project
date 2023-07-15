@@ -14,11 +14,11 @@ class create_stats:
         self.threshold = threshold
         self.hold_till = hold_till
         
-        results_dir = '/Desktop/Machine_Learning_Project/Machine_Learning_Project/results'
+        results_dir = #add results directory
         self.folder_name = f'{str(self.model)}_{self.threshold}_{self.hold_till}'
         self.folder_dir = os.path.join(results_dir, self.folder_name)
 
-        history_df_path = '/Desktop/Machine_Learning_Project/Machine_Learning_Project/results//history_df.csv'
+        history_df_path = os.path.join(self.folder_dir, 'history_df.csv')
         self.history_df = pd.read_csv(history_df_path)
         self.history_df['buy_date'] = pd.to_datetime(self.history_df['buy_date'])
         self.history_df['sell_date'] = pd.to_datetime(self.history_df['sell_date'])
@@ -53,7 +53,7 @@ class create_stats:
     
     def save_stats(self):
 
-        df = pd.read_csv('/results/model_result_summary.csv')
+        df = pd.read_csv(## add results/model_result_summary.csv path)
 
         results_dict = {'Model': f'{self.model}_{self.threshold}_{self.hold_till}',\
             'Gains': self.total_gains,
@@ -63,7 +63,7 @@ class create_stats:
             'Maximum Gain': self.maximum_gain,
             'Maximum Loss': self.maximum_loss}
         df = df.append(results_dict, ignore_index = True)
-        df.to_csv('results/model_result_summary.csv')        
+        df.to_csv(## add path results/model_result_summary.csv')        
 
 if __name__ == "__main__":
     cs = create_stats('LR_v1_predict', 1, 1)

@@ -4,7 +4,7 @@ authors - Alessandro Pesare, Fabio Letizia
 """
 
 import numpy as np
-from stock_utils.simulator import simulator
+from stock_utils_ import simulator
 #from stock_utils.stock_utils import get_stock_price
 from models import logistic_regression_inference
 from datetime import datetime
@@ -147,7 +147,7 @@ class backtester(simulator):
         results_df_path = os.path.join(self.folder_dir, 'history_df.csv')
         self.history_df.to_csv(results_df_path, index = False)
         
-        #save params and results summary
+        #save params and results summary probabilmente non necessarie
         results_summary_path = os.path.join(self.folder_dir, 'results_summary')
         results_summary = [self.initial_capital, self.total_gain]
         params_path = os.path.join(self.folder_dir, 'params')
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
     stocks = list(np.unique(dow + other))
     back = backtester(dow, LR_v1_predict, 3000, datetime(2021, 1, 1), datetime(2021, 12, 31), threshold = 0.9, sell_perc = 0.03, hold_till = 10,\
-        stop_perc = 0.03)
+    stop_perc = 0.03)
     back.backtest()
 
     

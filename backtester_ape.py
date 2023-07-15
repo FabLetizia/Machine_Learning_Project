@@ -4,7 +4,7 @@ authors - Alessandro Pesare, Fabio Letizia
 """
 
 import numpy as np
-from stock_utils.simulator import simulator
+from stock_utils_ import simulator
 #from stock_utils.stock_utils import get_stock_price
 from models import logistic_regression_inference
 from datetime import datetime

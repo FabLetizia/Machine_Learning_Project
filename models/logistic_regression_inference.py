@@ -7,20 +7,20 @@ from doctest import OutputChecker
 import numpy as np
 import pickle
 from sklearn.linear_model import LogisticRegression
-from stock_utils.stock_utils import timestamp, create_train_data, get_data, create_test_data, get_stock_price
+from stock_utils_ import stock_utils
 from datetime import timedelta
 import time
 
 def load_LR(model_version):
 
-   # file = #add path to the saved models folder and then model version 'eg: f'//saved_models//lr_{model_version}.sav'
+    file = '/Users/alessandropesare/Desktop/Machine_Learning_project/saved_models/lr_v1.sav'
     loaded_model = pickle.load(open(file, 'rb'))
 
     return loaded_model
 
 def load_scaler(model_version):
 
-    #file = ## add path to //saved_models//scaler_{model_version}.sav'
+    file = 'Users/alessandropesare/Desktop/Machine_Learning_project/saved_models/scaler_lr_v1.sav'
     loaded_model = pickle.load(open(file, 'rb'))
 
     return loaded_model
@@ -39,8 +39,8 @@ def LR_v1_predict(stock, start_date, end_date, threshold = 0.98):
     this function predict given the data
     """
     #create model and scaler instances
-    scaler = load_scaler('v2')
-    lr = load_LR('v2')
+    scaler = load_scaler('v1')
+    lr = load_LR('v1')
     #create input
     data = create_test_data(stock, start_date, end_date)
     #get close price of final date
