@@ -43,18 +43,20 @@ i valori normalizzati dei prezzi e identifica i minimi e i massimi locali.
 def get_data(symbol, start_date=None, end_date=None, n=10):
     print("Start download")
     data = yf.download(symbol, start=start_date, end=end_date)
+    print(data.size)
+    print(data)
     print("End download")
     data.reset_index(inplace=True)
 
     data['date'] = pd.to_datetime(data['Date'], unit = 'ms')
 
-#add the noramlzied value function and create a new column
+    #add the noramlzied value function and create a new column
     #la funzione apply() viene utilizzata per applicare una funzione personalizzata normalized_values() a ogni riga 
     #del DataFrame data. La funzione normalized_values() prende in input i valori high, low e close di ogni riga e
     #restituisce il valore normalizzato calcolato tramite la formula (close - low) / (high - low).
     data['normalized_value'] = data.apply(lambda x: normalized_values(x.High, x.Low, x.Close), axis=1)
 
-#column with local minima and maxima
+    #column with local minima and maxima
     #La funzione argrelextrema() restituisce gli indici degli elementi dell'array data che
     #corrispondono ai minimi e ai massimi locali.
     #In sostanza, il parametro order viene utilizzato per determinare la larghezza della finestra di ricerca
@@ -148,6 +150,7 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
     for stock in stocks:
         #get data to a dataframe
         data, idx_with_mins, idx_with_maxs = get_data(stock, start_date, end_date)
+        print(data)
         #create regressions for 3, 5 and 10 days
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
@@ -161,7 +164,7 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
        # idx_with_mins = np.where(data['loc_min'] > 0)[0]
        # idx_with_maxs = np.where(data['loc_max'] > 0)[0]
 
-#crea un nuovo DataFrame _data_ contenente solo le righe del DataFrame data che contengono minimi o massimi locali e 
+    #crea un nuovo DataFrame _data_ contenente solo le righe del DataFrame data che contengono minimi o massimi locali e 
     #poi reimposta gli indici del DataFrame in modo che siano numerati in ordine crescente a partire da 0.
         data = data[(data['loc_min'] > 0) | (data['loc_max'] > 0)].reset_index(drop=True)
         #create a dummy variable for local_min (0) and max (1)
@@ -197,20 +200,17 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
 
     return test_data.dropna(axis=0)
 
-# List of Dow 30 stocks
-dow30_stocks = ['AAPL', 'MSFT', 'JPM', 'V', 'RTX', 'PG', 'GS', 'NKE', 'DIS', 'AXP',
-                'HD', 'INTC', 'WMT', 'IBM', 'MRK', 'UNH', 'KO', 'CAT', 'TRV', 'JNJ',
-                'CVX', 'MCD', 'VZ', 'CSCO', 'XOM', 'BA', 'MMM', 'PFE', 'WBA', 'DD']
-
+dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
+        'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
+        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
 # List of 20 important S&P 500 stocks (for demonstration purposes)
-sp500_stocks = ['GOOGL', 'AMZN', 'TSLA', 'NVDA', 'JPM', 'MA', 'BAC', 'NFLX', 'ADBE',
-                'DIS', 'PYPL', 'CMCSA', 'COST', 'PEP', 'INTU', 'CSCO', 'AVGO', 'TXN', 'CHTR']
+sp500_stocks = ['AAPL','MSFT','GOOG','AMZN','TSLA','BRK-A','NVDA','FB','V','JPM','UNH','JNJ','WMT','PG','BAC','MA','HD','XOM','DIS','KO']
 
 # Training and validation data
-train_data = create_train_data(dow30_stocks + sp500_stocks, start_date='2007-01-01', end_date='2020-12-31')
+train_data = create_train_data(dow + sp500_stocks, start_date='2007-01-01', end_date='2020-12-31')
 
 # Test data
-test_data = create_test_data(dow30_stocks + sp500_stocks, start_date='2021-01-01', end_date='2021-12-31')
+test_data = create_test_data(dow + sp500_stocks, start_date='2021-01-01', end_date='2021-12-31')
 
 # Print the training data
 print("Training Data:")

@@ -28,11 +28,7 @@ import os
 import sys
 import pickle
 
-# Aggiungi il percorso della cartella "stock_utils" al percorso di ricerca dei moduli
-stock_utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'stock_utils'))
-sys.path.append(stock_utils_path)
-
-from stock_utils_ import stock_utils
+from stock_utils.stock_utils import create_train_data
 import sklearn 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -95,6 +91,7 @@ class LR_training:
             try: 
                 df = stock_utils.create_train_data(stock, n = 10)
                 self.main_df = self.main_df.append(df)
+                print(f"Fetched data for {stock}. Total samples: {len(df)}")
             except:
                 pass
         print(f'{len(self.main_df)} samples were fetched from the database..')
@@ -184,6 +181,4 @@ class LR_training:
 import argparse
 
 if __name__ == "__main__":
-    stock_utils_path = os.path.abspath("stock_utils.py")
-    print(stock_utils_path)
     run_lr = LR_training('v2')
