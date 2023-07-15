@@ -2,6 +2,10 @@
 authors - Alessandro Pesare, Fabio Letizia
 stock utils for preparing training data.
 """
+
+# Il modulo stock_utils contiene diverse funzioni utili per preparare i dati
+#  di addestramento per il tuo modello
+
 import pandas as pd
 import numpy as np
 import yfinance as yf
@@ -18,10 +22,24 @@ import numpy as np
 from scipy.signal import argrelextrema
 from datetime import datetime
 
+"""
+Questa funzione converte una data dt in un timestamp UNIX espresso in millisecondi.
+La funzione timestamp(dt) prende un argomento dt, un oggetto di tipo datetime che rappresenta una data e un'ora specifiche.
+La variabile epoch viene inizializzata con il valore di datetime.utcfromtimestamp(0).
+Questa chiamata restituisce un oggetto datetime che rappresenta la data e l'ora corrispondenti all'inizio dell'epoca Unix,
+ovvero 1 gennaio 1970 00:00:00 UTC.
+Successivamente, la funzione calcola la differenza tra l'argomento dt e l'epoca (in millisecondi) 
+"""
 def timestamp(dt):
     epoch = datetime.utcfromtimestamp(0)
     return int((dt - epoch).total_seconds() * 1000)
 
+"""
+La funzione get_data(sym, start_date=None, end_date=None, n=10) è responsabile di ottenere
+i dati storici di prezzo per l'azione specificata utilizzando Yahoo finance.
+Dopo aver ottenuto i dati, la funzione get_data esegue ulteriori operazioni sui dati, ad esempio calcola 
+i valori normalizzati dei prezzi e identifica i minimi e i massimi locali.
+"""
 def get_data(symbol, start_date=None, end_date=None, n=10):
     print("Start download")
     data = yf.download(symbol, start=start_date, end=end_date)
@@ -30,16 +48,35 @@ def get_data(symbol, start_date=None, end_date=None, n=10):
 
     data['date'] = pd.to_datetime(data['Date'], unit = 'ms')
 
+#add the noramlzied value function and create a new column
+    #la funzione apply() viene utilizzata per applicare una funzione personalizzata normalized_values() a ogni riga 
+    #del DataFrame data. La funzione normalized_values() prende in input i valori high, low e close di ogni riga e
+    #restituisce il valore normalizzato calcolato tramite la formula (close - low) / (high - low).
     data['normalized_value'] = data.apply(lambda x: normalized_values(x.High, x.Low, x.Close), axis=1)
 
+#column with local minima and maxima
+    #La funzione argrelextrema() restituisce gli indici degli elementi dell'array data che
+    #corrispondono ai minimi e ai massimi locali.
+    #In sostanza, il parametro order viene utilizzato per determinare la larghezza della finestra di ricerca
+    #per i minimi e i massimi relativi dell'array 'close', consentendo di trovare i minimi e i massimi locali
+    #dell'azione in base a una finestra di osservazione specifica.
     data['loc_min'] = data.iloc[argrelextrema(data.Close.values, np.less_equal, order=n)[0]]['Close']
     data['loc_max'] = data.iloc[argrelextrema(data.Close.values, np.greater_equal, order=n)[0]]['Close']
 
+#idx with mins and max
+    #a funzione np.where() di NumPy per trovare gli indici delle righe del DataFrame data che contengono
+    #un valore positivo sia nella colonna 'loc_min' che nella colonna 'loc_max'
     idx_with_mins = np.where(data['loc_min'] > 0)[0]
     idx_with_maxs = np.where(data['loc_max'] > 0)[0]
 
+#la funzione restituisce il DataFrame data con le colonne 'loc_min' e 'loc_max', che contengono i valori
+    #del prezzo di chiusura dell'azione corrispondenti ai minimi e ai massimi locali, insieme agli indici delle
+    #righe che contengono i minimi e i massimi locali.
     return data, idx_with_mins, idx_with_maxs
 
+"""
+returns the stock price given a date
+"""
 def get_stock_price(stock, date):
     start_date = date - timedelta(days=10)
     end_date = date
@@ -54,41 +91,64 @@ def get_stock_price(stock, date):
     except IndexError:
         pass
 
-# Function to calculate normalized values
+"""
+normalize the price between 0 and 1.
+"""
 def normalized_values(high, low, close):
-    epsilon = 10e-10
+    epsilon = 10e-10  #epsilon to avoid deletion by 0
     high = high - low
     close = close - low
     return close / (high + epsilon)
 
-# Function to perform linear regression
+"""
+Questa funzione esegue una regressione lineare sui dati di input x e y e restituisce il coefficiente di regressione.
+Nel caso della funzione linear_regression(x, y), si sta eseguendo una regressione lineare con una sola variabile di input x
+e una sola variabile di output y. Pertanto, coef_ è un array bidimensionale con una sola riga e una sola colonna.
+"""
 def linear_regression(x, y):
     lr = LinearRegression()
     lr.fit(x, y)
     return lr.coef_[0][0]
 
-# Function to perform n-day regression
+"""
+La funzione n_day_regression(n, df, idxs) esegue una regressione lineare per un determinato numero di giorni (n)
+utilizzando una finestra mobile di dati. Calcola il coefficiente di regressione per ogni finestra e lo assegna al dataframe df.
+Aggiunge i valori di regressione come una nuova colonna nel DataFrame df e restituisce il DataFrame modificato.
+"""
 def n_day_regression(n, df, idxs):
+    #_varname_ è una variabile che viene creata all'interno della 
+    # funzione utilizzando una f-string (format string) di Python.
     _varname_ = f'{n}_reg'
-    df[_varname_] = np.nan
+    df[_varname_] = np.nan # np.nan assegna un valore NaN (Not a Number) a ogni cella della nuova colonna _varname_
 
     for idx in idxs:
         if idx > n:
+            # La riga y = df['close'][idx - n: idx].to_numpy() seleziona i valori di chiusura (close) dell'azione per 
+            # gli ultimi n giorni fino all'indice corrente idx e li converte in un array NumPy utilizzando il metodo to_numpy().
+            # Questi valori di chiusura verranno utilizzati come variabili di output y per il calcolo della regressione lineare.
             y = df['Close'][idx - n:idx].to_numpy()
             x = np.arange(0, n)
+            #reshape
             y = y.reshape(y.shape[0], 1)
             x = x.reshape(x.shape[0], 1)
+            #calculate regression coefficient 
             coef = linear_regression(x, y)
-            df.loc[idx, _varname_] = coef
+            df.loc[idx, _varname_] = coef #add the new value
 
     return df
 
-# Function to create training data
+"""
+Questa funzione prende un'azione come argomento e restituire un dataframe contenente i dati di addestramento
+per quell'azione. I dati di addestramento vengono ottenuti chiamando la funzione get_data con
+l'azione specifica.
+"""
 def create_train_data(stocks, start_date=None, end_date=None, n=10):
     train_data = pd.DataFrame()
 
     for stock in stocks:
-        data, _, _ = get_data(stock, start_date, end_date)
+        #get data to a dataframe
+        data, idx_with_mins, idx_with_maxs = get_data(stock, start_date, end_date)
+        #create regressions for 3, 5 and 10 days
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
         data = n_day_regression(10, data, range(len(data)))
@@ -98,10 +158,13 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
         data['loc_min'] = data.iloc[argrelextrema(data['Close'].values, np.less_equal, order=n)[0]]['Close']
         data['loc_max'] = data.iloc[argrelextrema(data['Close'].values, np.greater_equal, order=n)[0]]['Close']
 
-        idx_with_mins = np.where(data['loc_min'] > 0)[0]
-        idx_with_maxs = np.where(data['loc_max'] > 0)[0]
+       # idx_with_mins = np.where(data['loc_min'] > 0)[0]
+       # idx_with_maxs = np.where(data['loc_max'] > 0)[0]
 
+#crea un nuovo DataFrame _data_ contenente solo le righe del DataFrame data che contengono minimi o massimi locali e 
+    #poi reimposta gli indici del DataFrame in modo che siano numerati in ordine crescente a partire da 0.
         data = data[(data['loc_min'] > 0) | (data['loc_max'] > 0)].reset_index(drop=True)
+        #create a dummy variable for local_min (0) and max (1)
         data['target'] = [1 if x > 0 else 0 for x in data.loc_max]
 
         cols_of_interest = ['Volume', 'normalized_value', '3_reg', '5_reg', '10_reg', '20_reg', 'target']
@@ -109,14 +172,17 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
 
         train_data = pd.concat([train_data, data], ignore_index=True)
 
-    return train_data.dropna(axis=0)
+    return train_data.dropna(axis=0) # elimino i Nan prima di restituire il risultato
 
-# Function to create test data
+"""
+this function create test data sample for logistic regression model
+"""
 def create_test_data(stocks, start_date=None, end_date=None, n=10):
     test_data = pd.DataFrame()
 
     for stock in stocks:
         data, _, _ = get_data(stock, start_date, end_date)
+        #create regressions for 3, 5 and 10 days (ogni n_day_regression introduce una nuova colonna nel df n_reg)
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
         data = n_day_regression(10, data, range(len(data)))
@@ -153,3 +219,38 @@ print(train_data.head())
 # Print the test data
 print("Test Data:")
 print(test_data.head())
+
+'''
+def predict_trend(stock, _model_, start_date = None, end_date = None, n = 10):
+
+    #get data to a dataframe
+    data, _, _ = get_data(stock, start_date, end_date, n)
+    
+    idxs = np.arange(0, len(data))
+    #create regressions for 3, 5 and 10 days
+    data = n_day_regression(3, data, idxs)
+    data = n_day_regression(5, data, idxs)
+    data = n_day_regression(10, data, idxs)
+    data = n_day_regression(20, data, idxs)
+        
+    #create a column for predicted value
+    data['pred'] = np.nan
+
+    #get data
+    cols = ['volume', 'normalized_value', '3_reg', '5_reg', '10_reg', '20_reg']
+    x = data[cols]
+
+    #scale the x data
+    scaler = MinMaxScaler()
+    x = scaler.fit_transform(x)
+    #x.shape[0] restituisce la lunghezza del primo asse dell'array
+    for i in range(x.shape[0]):
+        
+        try:
+            data['pred'][i] = _model_.predict(x[i, :])
+
+        except:
+            data['pred'][i] = np.nan
+
+    return data
+'''
