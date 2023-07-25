@@ -149,7 +149,7 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
 
     for stock in stocks:
         #get data to a dataframe
-        data, idx_with_mins, idx_with_maxs = get_data(stock, start_date, end_date)
+        data, idx_with_mins, idx_with_maxs = get_data(stock,'2018-01-01','2021-01-01')
         print(data)
         #create regressions for 3, 5 and 10 days
         data = n_day_regression(3, data, range(len(data)))
@@ -164,9 +164,11 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
        # idx_with_mins = np.where(data['loc_min'] > 0)[0]
        # idx_with_maxs = np.where(data['loc_max'] > 0)[0]
 
-    #crea un nuovo DataFrame _data_ contenente solo le righe del DataFrame data che contengono minimi o massimi locali e 
-    #poi reimposta gli indici del DataFrame in modo che siano numerati in ordine crescente a partire da 0.
+        #crea un nuovo DataFrame _data_ contenente solo le righe del DataFrame data che contengono minimi o massimi locali e 
+        #poi reimposta gli indici del DataFrame in modo che siano numerati in ordine crescente a partire da 0.
         data = data[(data['loc_min'] > 0) | (data['loc_max'] > 0)].reset_index(drop=True)
+        print(data.size)
+        print(data)
         #create a dummy variable for local_min (0) and max (1)
         data['target'] = [1 if x > 0 else 0 for x in data.loc_max]
 
@@ -174,9 +176,10 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
         data = data[cols_of_interest]
 
         train_data = pd.concat([train_data, data], ignore_index=True)
+        print(train_data)
+        print(train_data.size)
 
-    return train_data.dropna(axis=0) # elimino i Nan prima di restituire il risultato
-
+    return train_data.dropna(axis=0)
 """
 this function create test data sample for logistic regression model
 """
@@ -184,7 +187,7 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
     test_data = pd.DataFrame()
 
     for stock in stocks:
-        data, _, _ = get_data(stock, start_date, end_date)
+        data, _, _ = get_data(stock, '2022-01-01', '2022-12-31')
         #create regressions for 3, 5 and 10 days (ogni n_day_regression introduce una nuova colonna nel df n_reg)
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
@@ -199,7 +202,7 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
         test_data = pd.concat([test_data, data], ignore_index=True)
 
     return test_data.dropna(axis=0)
-
+"""
 dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
         'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
         'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
@@ -219,7 +222,7 @@ print(train_data.head())
 # Print the test data
 print("Test Data:")
 print(test_data.head())
-
+"""
 '''
 def predict_trend(stock, _model_, start_date = None, end_date = None, n = 10):
 

@@ -4,8 +4,10 @@ authors - Alessandro Pesare, Fabio Letizia
 """
 
 import numpy as np
-from stock_utils_ import simulator
-#from stock_utils.stock_utils import get_stock_price
+import sys
+sys.path.append("/Users/alessandropesare/Desktop/ML_Project/stock_utils")
+from stock_utils.simulator import simulator
+from stock_utils.stock_utils import get_stock_price
 from models import logistic_regression_inference
 from datetime import datetime
 from datetime import timedelta
@@ -103,10 +105,10 @@ class backtester(simulator):
         self.save_results()      
         return
     """
-    this function queries to td database and get data of a particular stock on a given day back to certain amount of days
+    this function queries to database and get data of a particular stock on a given day back to certain amount of days
     (default is 30). 
     """
-    def get_stock_data(self, stock, back_to = 40):
+    def get_stock_data(self, stock, back_to = 30):
    
         #get start and end dates
         end = self.day
@@ -136,6 +138,7 @@ class backtester(simulator):
 
         def take_first(elem):
             return elem[1] # secondo elemento della coppia
+
         #ordinamento rispetto al valore associato alla chiave
         self.daily_scanner = OrderedDict(sorted(self.daily_scanner.items(), key = take_first, reverse = True))
 
@@ -160,14 +163,13 @@ class backtester(simulator):
 
 if __name__ == "__main__":
     #stocks list
-    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
-        'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
-    other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
-        'FDX', 'MCD', 'PEP', ]
-
-    stocks = list(np.unique(dow + other))
-    back = backtester(dow, LR_v1_predict, 3000, datetime(2021, 1, 1), datetime(2021, 12, 31), threshold = 0.9, sell_perc = 0.03, hold_till = 10,\
+    #dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
+    #   'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
+    #   'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+    
+    other = ['EBAY', 'AMZN', 'GOOG', 'SNAP']
+    stocks = list(np.unique(other))
+    back = backtester(dow, LR_v1_predict, 3000, datetime(2021, 1, 1), datetime(2021, 1, 31), threshold = 1, sell_perc = 0.03, hold_till = 1,\
     stop_perc = 0.03)
     back.backtest()
 

@@ -91,15 +91,18 @@ class simulator:
         if print_results:
             print ("{:<10} {:<10} {:<10} {:<10} {:<10}".format('STOCK', 'BUY PRICE', 'SHARES', 'SELL PRICE', 'NET GAIN'))  
         
+        summary_data = []  # Lista per salvare i dati del riepilogo
+
         for values in self.history:
             net_gain = (values[3] - values[1]) * values[2]
             self.total_gain += net_gain
-            self.history_df = self.history_df.append({'stock': values[0], 'buy_price': values[1], 'n_shares': values[2], 'sell_price': values[3]\
-                 ,'net_gain': net_gain, 'buy_date': values[4], 'sell_date': values[5]}, ignore_index = True)
+
+            summary_df = pd.DataFrame(summary_data, columns=['stock', 'buy_price', 'n_shares', 'sell_price', 'net_gain'])
+            self.history_df = pd.concat([self.history_df,summary_df], ignore_index=True)
                     
             if print_results:
                 print("{:<10} {:<10} {:<10} {:<10} {:<10}".format(values[0], values[1], values[2], values[3], np.round(net_gain, 2)))
-
+        
     # Questo metodo stampa il riepilogo dei risultati. Chiama il metodo create_summary per generare i risultati e quindi
     # stampa il saldo iniziale, il saldo finale, il guadagno totale e il rapporto tra guadagno e capitale in percentuale.
 

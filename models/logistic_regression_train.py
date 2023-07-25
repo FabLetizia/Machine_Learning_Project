@@ -26,8 +26,8 @@ import time
 from datetime import datetime
 import os
 import sys
+sys.path.append("/Users/alessandropesare/Desktop/ML_Project/stock_utils")
 import pickle
-
 from stock_utils.stock_utils import create_train_data
 import sklearn 
 from sklearn.model_selection import train_test_split
@@ -51,6 +51,9 @@ class LR_training:
 
         self.model_version = model_version
         self.threshold = threshold
+        #main dataframe
+        self.main_df = pd.DataFrame(columns=['Volume', 'normalized_value', '3_reg', '5_reg', '10_reg', '20_reg', 'target'])
+
         
         if start_date:
             self.start_date = start_date
@@ -58,16 +61,13 @@ class LR_training:
             self.end_date = end_date
 
         #get stock ticker symbols
-        dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
-        'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+        print("Start inizialization")
+
+        dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM']
         sp500 = pd.read_csv('companies.csv')
         sp = list(sp500['Ticker'])
-        stocks = dow + sp[:20]
+        stocks = dow + sp[:3]
         self.stocks = list(np.unique(stocks))
-
-        #main dataframe
-        self.main_df = pd.DataFrame(columns = ['volume', 'normalized_value', '3_reg', '5_reg', '10_reg', '20_reg', 'target'])
 
         #init models
         self.scaler = MinMaxScaler()
@@ -77,23 +77,27 @@ class LR_training:
         self.fetch_data()
         self.create_train_test()
         self.fit_model()
-        self.confusion_matrix()
         self.save_model()
         """
     fetch_data: recupera i dati di addestramento richiamando la funzione create_train_data del modulo stock_utils
     per ogni simbolo ticker.I dati vengono aggiunti al dataframe principale main_df.
     """
     def fetch_data(self):
+        print("stat fetch data")
         """
         get train and test data
         """ 
         for stock in self.stocks:
             try: 
-                df = stock_utils.create_train_data(stock, n = 10)
-                self.main_df = self.main_df.append(df)
+                print("try")
+                df = create_train_data(stock, n = 10)
+                print("Dati creati")
+                print(df)
+                self.main_df = pd.concat([self.main_df, df], ignore_index=True)
+                print(f"Size of self.main_df after fetching data for {stock}: {len(self.main_df)}")
                 print(f"Fetched data for {stock}. Total samples: {len(df)}")
-            except:
-                pass
+            except Exception as e:
+                print(f"Error fetching data for {stock}: {str(e)}")
         print(f'{len(self.main_df)} samples were fetched from the database..')
     """
     create_train_test: crea i dati di addestramento e test suddividendo il dataframe principale main_df in input (x) e output (y),
@@ -105,6 +109,11 @@ class LR_training:
         """
         self.main_df = self.main_df.sample(frac = 1, random_state = 3). reset_index(drop = True)
         self.main_df['target'] = self.main_df['target'].astype('category')
+
+        # Check if the main_df is empty
+        if self.main_df.empty:
+            print("Error: The main DataFrame is empty. No data to split.")
+            return
         
         y = self.main_df.pop('target').to_numpy()
         y = y.reshape(y.shape[0], 1)
@@ -132,15 +141,6 @@ class LR_training:
         #preds with threshold
         self.predictions_proba = self.lr._predict_proba_lr(self.test_x)
         self.predictions_proba_thresholded = self._threshold(self.predictions_proba, self.threshold)
-
-#confusion_matrix: calcola le matrici di confusione utilizzando le previsioni del modello sui dati di test.     
-
-    def confusion_matrix(self):
-        cm = confusion_matrix(self.test_y, self.predictions)
-        self.cmd = ConfusionMatrixDisplay(cm)
-        
-        cm_thresholded = confusion_matrix(self.test_y, self.predictions_proba_thresholded)
-        self.cmd_thresholded = ConfusionMatrixDisplay(cm_thresholded)
     """
     _threshold  prende in input un array di probabilità previste e applica una soglia per ottenere le previsioni
     soglia corrispondenti. Restituisce un array numpy costituito di 0 o 1 a secondo della soglia.
@@ -164,19 +164,6 @@ class LR_training:
         scaler_file = f'scaler_{self.model_version}.sav'
         scaler_dir = os.path.join(saved_models_dir, scaler_file)
         pickle.dump(self.scaler, open(scaler_dir, 'wb'))
-
-        print(f'Saved the model and scaler in {saved_models_dir}')
-        cm_path = os.path.join(os.getcwd(), 'results\Confusion Matrices')
-        
-        #save cms
-        plt.figure()
-        self.cmd.plot()
-        plt.savefig(f'{cm_path}\\cm_{self.model_version}.jpg')
-
-        plt.figure()
-        self.cmd_thresholded.plot()
-        plt.savefig(f'{cm_path}\\cm_thresholded_{self.model_version}.jpg')
-        print(f'Figures saved in {cm_path}')
 
 import argparse
 
