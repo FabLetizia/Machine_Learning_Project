@@ -7,10 +7,12 @@ import numpy as np
 from stock_utils.simulator import simulator
 from stock_utils.stock_utils import get_stock_price
 from models import logistic_regression_inference
+from models import random_forest_inference
 from datetime import datetime
 from datetime import timedelta
 import pandas as pd
 from models.logistic_regression_inference import LR_v1_predict, LR_v1_sell
+from models.random_forest_inference import predict, sell
 import warnings
 from collections import OrderedDict
 warnings.filterwarnings("ignore")
@@ -74,8 +76,10 @@ class backtester(simulator):
                 #get stock price on the day
                 stocks = [key for key in self.buy_orders.keys()] # ottiene una lista di tutti i titoli azionari che rappresentano le azioni acquistate in precedenza(le azioni acquistate in precedenza vengono memorizzate nel dizionario della classe simulator).
                 for s in stocks:
-                    recommended_action, current_price = LR_v1_sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
+                    recommended_action, current_price = sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
                         self.sell_perc, self.hold_till, self.stop_perc)
+                    #recommended_action, current_price = LR_v1_sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
+                        #self.sell_perc, self.hold_till, self.stop_perc)
                     # la logica di vendita nella classe backtester si basa sulla funzione LR_v1_sell
                     if recommended_action == "SELL":
                         # print(f'Sold {s} for {current_price} on {self.day}')
@@ -130,15 +134,14 @@ class backtester(simulator):
 
 if __name__ == "__main__":
     #stocks list
-    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
-       'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-      'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM','INTC',\
+      'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH','WMT', 'DIS']
     
     other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
         'FDX', 'MCD', 'PEP']
     
     stocks = list(np.unique(other))
-    back = backtester(other, LR_v1_predict, 3000, datetime(2019, 1, 1), datetime(2019, 12, 12), threshold = 0.99, sell_perc = 0.04, hold_till = 5,\
+    back = backtester(dow, predict, 3000, datetime(2020, 1, 1), datetime(2020, 1, 3), threshold = 0.9, sell_perc = 0.05, hold_till = 5,\
     stop_perc = 0.005)
     back.backtest()
 

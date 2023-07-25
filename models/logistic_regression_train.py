@@ -32,8 +32,6 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.linear_model import LogisticRegression
-
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import seaborn as sns
 
 """
@@ -71,7 +69,7 @@ class LR_training:
         sp = list(sp500['Ticker'])
 
         stocks = dow + sp[:20]
-        
+
         self.stocks = list(np.unique(stocks))
 
         #init models

@@ -117,7 +117,7 @@ if __name__ == "__main__":
     #stocks list
     dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
         'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+        'CRM', 'VZ', 'V']
 
     other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
         'FDX', 'MCD', 'PEP', ]
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     stocks = list(np.unique(dow + other))
     # threshold soglia di confidenza, trattiene l'azione fino a una % di guadagno(sell_perc) o a una certa % di perdita(stop_perc)
     # o entro un certo numero di giorni(hold_till).
-    back = backtester(dow, LR_v1_predict, 3000, datetime(2019, 1, 1), datetime(2019, 12, 1), threshold = 1, sell_perc = 0.04, hold_till = 10,\
+    back = backtester(stocks, LR_v1_predict, 3000, datetime(2019, 1, 1), datetime(2019, 1, 10), threshold = 1, sell_perc = 0.04, hold_till = 10,\
         stop_perc = 0.005)
     back.backtest()
 
