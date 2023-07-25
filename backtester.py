@@ -4,8 +4,6 @@ authors - Alessandro Pesare, Fabio Letizia
 """
 
 import numpy as np
-import sys
-sys.path.append("/Users/alessandropesare/Desktop/ML_Project/stock_utils")
 from stock_utils.simulator import simulator
 from stock_utils.stock_utils import get_stock_price
 from models import logistic_regression_inference
@@ -27,8 +25,8 @@ dal modello e implementa una strategia di acquisto/vendita per simulare le trans
 """
 class backtester(simulator):
 
-    def __init__(self, stocks_list, model, capital, start_date, end_date, threshold = 0.99, sell_perc = 0.04, hold_till = 5,\
-         stop_perc = 0.005):
+    def __init__(self, stocks_list, model, capital, start_date, end_date, threshold, sell_perc, hold_till,\
+         stop_perc):
         
         super().__init__(capital) #initialize simulator
 
@@ -43,17 +41,6 @@ class backtester(simulator):
         self.hold_till = hold_till # il numero di giorni in cui una posizione viene mantenuta prima di essere venduta
         self.stop_perc = stop_perc # la percentuale di perdita al di sotto della quale una posizione viene venduta.
 
-        #current directory. Crea una cartella per i risultati del backtest.
-        current_dir = os.getcwd() # os.getcwd() restituisce una stringa rappresentante il percorso della directory corrente.
-        results_dir = os.path.join(current_dir, 'results') # la funzione os.path.join() per combinare la directory corrente (current_dir) con il nome della cartella dei risultati ('results')
-        #crea il nome della nuova cartella dei risultati. Il nome è costituito dalla rappresentazione in stringa del nome del modello (self.model.__name__),
-        #seguito dai valori della soglia (self.threshold) e del parametro hold_till.
-        folder_name = f'{str(self.model.__name__)}_{self.threshold}_{self.hold_till}'
-        self.folder_dir = os.path.join(results_dir, folder_name)
-        if not os.path.exists(self.folder_dir):
-            #create a new folder
-            os.makedirs(self.folder_dir)
-      
     def backtest(self):
         """
         start backtesting
@@ -101,8 +88,7 @@ class backtester(simulator):
         pbar.close()
         #sell the final stock and print final capital also print stock history with the methods of the superclass (simulator)
         self.print_bag()
-        self.print_summary() 
-        self.save_results()      
+        self.print_summary()    
         return
     """
     this function queries to database and get data of a particular stock on a given day back to certain amount of days
@@ -142,35 +128,18 @@ class backtester(simulator):
         #ordinamento rispetto al valore associato alla chiave
         self.daily_scanner = OrderedDict(sorted(self.daily_scanner.items(), key = take_first, reverse = True))
 
-    def save_results(self):
-        """
-        save history dataframe create figures and save
-        """
-        #save csv file
-        results_df_path = os.path.join(self.folder_dir, 'history_df.csv')
-        self.history_df.to_csv(results_df_path, index = False)
-        
-        #save params and results summary probabilmente non necessarie
-        results_summary_path = os.path.join(self.folder_dir, 'results_summary')
-        results_summary = [self.initial_capital, self.total_gain]
-        params_path = os.path.join(self.folder_dir, 'params')
-        params = [self.threshold, self.hold_till, self.sell_perc, self.stop_perc, self.start_date, self.end_date]
-        
-        with open(results_summary_path, 'wb') as fp:
-            pickle.dump(results_summary, fp)
-        with open(params_path, 'wb') as fp:
-            pickle.dump(params, fp)
-
 if __name__ == "__main__":
     #stocks list
-    #dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
-    #   'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-    #   'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
+       'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
+      'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
     
-    other = ['EBAY', 'AMZN', 'GOOG', 'SNAP']
+    other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
+        'FDX', 'MCD', 'PEP']
+    
     stocks = list(np.unique(other))
-    back = backtester(dow, LR_v1_predict, 3000, datetime(2021, 1, 1), datetime(2021, 1, 31), threshold = 1, sell_perc = 0.03, hold_till = 1,\
-    stop_perc = 0.03)
+    back = backtester(other, LR_v1_predict, 3000, datetime(2019, 1, 1), datetime(2019, 12, 12), threshold = 0.99, sell_perc = 0.04, hold_till = 5,\
+    stop_perc = 0.005)
     back.backtest()
 
     

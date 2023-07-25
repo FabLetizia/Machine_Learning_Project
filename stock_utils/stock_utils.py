@@ -149,7 +149,7 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
 
     for stock in stocks:
         #get data to a dataframe
-        data, idx_with_mins, idx_with_maxs = get_data(stock,'2018-01-01','2021-01-01')
+        data, idx_with_mins, idx_with_maxs = get_data(stock,'2015-01-01','2018-01-01')
         print(data)
         #create regressions for 3, 5 and 10 days
         data = n_day_regression(3, data, range(len(data)))
@@ -187,7 +187,7 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
     test_data = pd.DataFrame()
 
     for stock in stocks:
-        data, _, _ = get_data(stock, '2022-01-01', '2022-12-31')
+        data, _, _ = get_data(stock, '2020-01-01', '2020-12-31')
         #create regressions for 3, 5 and 10 days (ogni n_day_regression introduce una nuova colonna nel df n_reg)
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
@@ -202,27 +202,6 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
         test_data = pd.concat([test_data, data], ignore_index=True)
 
     return test_data.dropna(axis=0)
-"""
-dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
-        'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
-        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
-# List of 20 important S&P 500 stocks (for demonstration purposes)
-sp500_stocks = ['AAPL','MSFT','GOOG','AMZN','TSLA','BRK-A','NVDA','FB','V','JPM','UNH','JNJ','WMT','PG','BAC','MA','HD','XOM','DIS','KO']
-
-# Training and validation data
-train_data = create_train_data(dow + sp500_stocks, start_date='2007-01-01', end_date='2020-12-31')
-
-# Test data
-test_data = create_test_data(dow + sp500_stocks, start_date='2021-01-01', end_date='2021-12-31')
-
-# Print the training data
-print("Training Data:")
-print(train_data.head())
-
-# Print the test data
-print("Test Data:")
-print(test_data.head())
-"""
 '''
 def predict_trend(stock, _model_, start_date = None, end_date = None, n = 10):
 

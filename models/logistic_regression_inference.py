@@ -6,8 +6,6 @@ from doctest import OutputChecker
 import numpy as np
 import pickle
 from sklearn.linear_model import LogisticRegression
-import sys
-sys.path.append("/Users/alessandropesare/Desktop/ML_Project/stock_utils")
 from stock_utils.stock_utils import timestamp, create_train_data, get_data, create_test_data, get_stock_price
 from datetime import timedelta, datetime
 import time
@@ -26,7 +24,7 @@ def _threshold(probs, threshold):
     prob_thresholded = [0 if x > threshold else 1 for x in probs[:, 0]]
     return np.array(prob_thresholded)
 
-def LR_v1_predict(stock, start_date, end_date, threshold=0.98):
+def LR_v1_predict(stock, start_date, end_date, threshold):
     print(f"Stock: {stock}")
     print(f"Start date: {start_date}")
     print(f"End date: {end_date}")
@@ -51,7 +49,7 @@ def LR_v1_predict(stock, start_date, end_date, threshold=0.98):
 
     return prediction[:, 0], prediction_thresholded[0], close_price
 
-def LR_v1_sell(stock, buy_date, buy_price, todays_date, sell_perc=0.1, hold_till=3, stop_perc=0.05):
+def LR_v1_sell(stock, buy_date, buy_price, todays_date, sell_perc, hold_till, stop_perc):
     print(f"Stock: {stock}")
     print(f"Buy date: {buy_date}")
     print(f"Buy price: {buy_price}")

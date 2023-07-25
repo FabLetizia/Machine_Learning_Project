@@ -26,9 +26,8 @@ import time
 from datetime import datetime
 import os
 import sys
-sys.path.append("/Users/alessandropesare/Desktop/ML_Project/stock_utils")
 import pickle
-from stock_utils.stock_utils import create_train_data
+from stock_utils import create_train_data
 import sklearn 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -63,10 +62,16 @@ class LR_training:
         #get stock ticker symbols
         print("Start inizialization")
 
-        dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM']
+        dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
+        'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
+        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+
         sp500 = pd.read_csv('companies.csv')
+
         sp = list(sp500['Ticker'])
-        stocks = dow + sp[:3]
+
+        stocks = dow + sp[:20]
+        
         self.stocks = list(np.unique(stocks))
 
         #init models
@@ -151,7 +156,7 @@ class LR_training:
 
         return np.array(prob_thresholded)
 
-#save_model: salva il modello addestrato e lo scaler utilizzati, insieme alle matrici di confusione, in file specifici.
+#save_model: salva il modello addestrato e lo scaler utilizzati in file specifici.
 
     def save_model(self):
 
