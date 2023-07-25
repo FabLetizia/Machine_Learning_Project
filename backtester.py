@@ -6,8 +6,8 @@ authors - Alessandro Pesare, Fabio Letizia
 import numpy as np
 from stock_utils.simulator import simulator
 from stock_utils.stock_utils import get_stock_price
-from models import logistic_regression_inference
 from models import random_forest_inference
+from models import logistic_regression_inference
 from datetime import datetime
 from datetime import timedelta
 import pandas as pd
@@ -78,8 +78,6 @@ class backtester(simulator):
                 for s in stocks:
                     recommended_action, current_price = sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
                         self.sell_perc, self.hold_till, self.stop_perc)
-                    #recommended_action, current_price = LR_v1_sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
-                        #self.sell_perc, self.hold_till, self.stop_perc)
                     # la logica di vendita nella classe backtester si basa sulla funzione LR_v1_sell
                     if recommended_action == "SELL":
                         # print(f'Sold {s} for {current_price} on {self.day}')
@@ -135,13 +133,14 @@ class backtester(simulator):
 if __name__ == "__main__":
     #stocks list
     dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM','INTC',\
-      'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH','WMT', 'DIS']
+      'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH']
+     #'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
     
     other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
         'FDX', 'MCD', 'PEP']
     
     stocks = list(np.unique(other))
-    back = backtester(dow, predict, 3000, datetime(2020, 1, 1), datetime(2020, 1, 3), threshold = 0.9, sell_perc = 0.05, hold_till = 5,\
+    back = backtester(dow, predict, 3000, datetime(2019, 1, 1), datetime(2019, 1, 5), threshold = 0.9, sell_perc = 0.05, hold_till = 1,\
     stop_perc = 0.005)
     back.backtest()
 

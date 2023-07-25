@@ -17,7 +17,7 @@ from datetime import datetime
 import os
 import sys
 import pickle
-from stock_utils import create_train_data
+from stock_utils.stock_utils import create_train_data
 import sklearn 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -91,4 +91,4 @@ class RF_training:
         pickle.dump(self.scaler, open(scaler_dir, 'wb'))
 
 if __name__ == "__main__":
-    run_rf = RF_training('v2')
+    run_rf = RF_training('v1')

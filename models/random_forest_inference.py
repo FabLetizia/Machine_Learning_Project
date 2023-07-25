@@ -7,17 +7,17 @@ from stock_utils.stock_utils import timestamp, create_train_data, get_data, crea
 from sklearn.ensemble import RandomForestClassifier
 
     
-def load_RF(self, model_path):
+def load_RF(model_path):
         file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/rf_v2.sav'
         loaded_model = pickle.load(open(file, 'rb'))
         return loaded_model
 
-def load_scaler(self, scaler_path):
+def load_scaler(scaler_path):
         file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/scaler_v2.sav'
         loaded_model = pickle.load(open(file, 'rb'))
         return loaded_model
 
-def predict(self, stock, start_date, end_date, threshold):
+def predict(stock, start_date, end_date, threshold):
         print(f"Stock: {stock}")
         print(f"Start date: {start_date}")
         print(f"End date: {end_date}")
@@ -42,11 +42,11 @@ def predict(self, stock, start_date, end_date, threshold):
 
         return prediction[:, 0], prediction_thresholded[0], close_price
 
-def _threshold(self, probs, threshold):
+def _threshold(probs, threshold):
         prob_thresholded = [0 if x > threshold else 1 for x in probs]
         return np.array(prob_thresholded)
 
-def sell(self, stock, buy_date, buy_price, todays_date, sell_perc, hold_till, stop_perc):
+def sell(stock, buy_date, buy_price, todays_date, sell_perc, hold_till, stop_perc):
         print(f"Stock: {stock}")
         print(f"Buy date: {buy_date}")
         print(f"Buy price: {buy_price}")

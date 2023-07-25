@@ -27,7 +27,7 @@ from datetime import datetime
 import os
 import sys
 import pickle
-from stock_utils import create_train_data
+from stock_utils.stock_utils import create_train_data
 import sklearn 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
