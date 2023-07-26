@@ -149,7 +149,7 @@ def create_train_data(stocks, start_date=None, end_date=None, n=10):
 
     for stock in stocks:
         #get data to a dataframe
-        data, idx_with_mins, idx_with_maxs = get_data(stock,'2015-01-01','2018-01-01')
+        data, idx_with_mins, idx_with_maxs = get_data(stock,'2008-01-01','2018-01-01')
         print(data)
         #create regressions for 3, 5 and 10 days
         data = n_day_regression(3, data, range(len(data)))
@@ -187,7 +187,7 @@ def create_test_data(stocks, start_date=None, end_date=None, n=10):
     test_data = pd.DataFrame()
 
     for stock in stocks:
-        data, _, _ = get_data(stock, '2020-01-01', '2020-12-31')
+        data, _, _ = get_data(stock, '2020-01-01', '2022-12-31')
         #create regressions for 3, 5 and 10 days (ogni n_day_regression introduce una nuova colonna nel df n_reg)
         data = n_day_regression(3, data, range(len(data)))
         data = n_day_regression(5, data, range(len(data)))
