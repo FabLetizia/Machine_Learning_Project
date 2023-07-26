@@ -76,9 +76,11 @@ class RF_training:
         self.predictions_proba = self.rf.predict_proba(self.test_x)
         self.predictions_proba_thresholded = self._threshold(self.predictions_proba, self.threshold)
 
-    def _threshold(self, predictions, threshold):
-        prob_thresholded = [0 if x > threshold else 1 for x in predictions[:, 0]]
-        return np.array(prob_thresholded)
+    def _threshold(self, probs, threshold):
+        print(f"Probs shape: {probs.shape}")
+        print(f"Probs type: {type(probs)}")
+        prob_thresholded = np.where(probs[:, 1] > threshold, 1, 0)
+        return prob_thresholded
 
     def save_model(self):
         saved_models_dir = os.path.join(os.getcwd(), 'saved_models')
@@ -92,3 +94,4 @@ class RF_training:
 
 if __name__ == "__main__":
     run_rf = RF_training('v1')
+

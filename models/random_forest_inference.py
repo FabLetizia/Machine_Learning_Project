@@ -8,14 +8,20 @@ from sklearn.ensemble import RandomForestClassifier
 
     
 def load_RF(model_path):
-        file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/rf_v2.sav'
+        file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/rf_v1.sav'
         loaded_model = pickle.load(open(file, 'rb'))
         return loaded_model
 
 def load_scaler(scaler_path):
-        file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/scaler_v2.sav'
+        file = '/Users/alessandropesare/Desktop/ML_Project/saved_models/scaler_v1.sav'
         loaded_model = pickle.load(open(file, 'rb'))
         return loaded_model
+
+def _threshold(probs, threshold):
+    print(f"Probs shape: {probs.shape}")
+    print(f"Probs type: {type(probs)}")
+    prob_thresholded = np.where(probs[:, 1] > threshold, 1, 0)
+    return prob_thresholded
 
 def predict(stock, start_date, end_date, threshold):
         print(f"Stock: {stock}")
@@ -23,8 +29,8 @@ def predict(stock, start_date, end_date, threshold):
         print(f"End date: {end_date}")
         print(f"Threshold: {threshold}")
 
-        scaler = load_scaler('v2')
-        rf = load_RF('v2')
+        scaler = load_scaler('v1')
+        rf = load_RF('v1')
         print(rf)
         data = create_test_data(stock, start_date, end_date)
         close_price = data['Close'].values[-1]
@@ -34,17 +40,13 @@ def predict(stock, start_date, end_date, threshold):
 
         input_data_scaled = scaler.transform(input_data)
         prediction = rf.predict_proba(input_data_scaled)
-        prediction_thresholded = _threshold(prediction, threshold)
+        prediction_thresholded = _threshold(prediction, threshold).tolist()
 
         print(f"Prediction: {prediction}")
         print(f"Prediction Thresholded: {prediction_thresholded}")
         print(f"Close Price: {close_price}")
 
         return prediction[:, 0], prediction_thresholded[0], close_price
-
-def _threshold(probs, threshold):
-        prob_thresholded = [0 if x > threshold else 1 for x in probs]
-        return np.array(prob_thresholded)
 
 def sell(stock, buy_date, buy_price, todays_date, sell_perc, hold_till, stop_perc):
         print(f"Stock: {stock}")
@@ -66,3 +68,4 @@ def sell(stock, buy_date, buy_price, todays_date, sell_perc, hold_till, stop_per
             return "SELL", current_price
         else:
             return "HOLD", current_price
+

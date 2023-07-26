@@ -21,7 +21,9 @@ def load_scaler(model_version):
     return loaded_model
 
 def _threshold(probs, threshold):
+    print(probs)
     prob_thresholded = [0 if x > threshold else 1 for x in probs[:, 0]]
+    print(prob_thresholded)
     return np.array(prob_thresholded)
 
 def LR_v1_predict(stock, start_date, end_date, threshold):
@@ -41,6 +43,7 @@ def LR_v1_predict(stock, start_date, end_date, threshold):
 
     input_data_scaled = scaler.transform(input_data)
     prediction = lr._predict_proba_lr(input_data_scaled)
+    print(prediction)
     prediction_thresholded = _threshold(prediction, threshold)
 
     print(f"Prediction: {prediction}")

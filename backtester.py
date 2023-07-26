@@ -6,8 +6,8 @@ authors - Alessandro Pesare, Fabio Letizia
 import numpy as np
 from stock_utils.simulator import simulator
 from stock_utils.stock_utils import get_stock_price
-from models import random_forest_inference
 from models import logistic_regression_inference
+from models import random_forest_inference
 from datetime import datetime
 from datetime import timedelta
 import pandas as pd
@@ -78,6 +78,8 @@ class backtester(simulator):
                 for s in stocks:
                     recommended_action, current_price = sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
                         self.sell_perc, self.hold_till, self.stop_perc)
+                    #recommended_action, current_price = sell(s, self.buy_orders[s][3], self.buy_orders[s][0], self.day, \
+                        #self.sell_perc, self.hold_till, self.stop_perc)
                     # la logica di vendita nella classe backtester si basa sulla funzione LR_v1_sell
                     if recommended_action == "SELL":
                         # print(f'Sold {s} for {current_price} on {self.day}')
@@ -118,12 +120,13 @@ class backtester(simulator):
         for stock in self.stocks:
             try:#to ignore the stock if no data is available. #for staturdays or sundays etc
                 prediction, prediction_thresholded, close_price = self.get_stock_data(stock)
+                print(f"Stock: {stock}, Prediction: {prediction}, Prediction Thresholded: {prediction_thresholded}, Close Price: {close_price}")
                 #if prediction greater than
                 if prediction_thresholded < 1: #if prediction is zero (to buy)
                     self.daily_scanner[stock] = (prediction, prediction_thresholded, close_price)
-            except:
-                pass
-
+            except Exception as e:
+                print(f"An error occurred for stock {stock}: {e}")
+                return None, None, None
         def take_first(elem):
             return elem[1] # secondo elemento della coppia
 
@@ -132,16 +135,18 @@ class backtester(simulator):
 
 if __name__ == "__main__":
     #stocks list
-    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM','INTC',\
-      'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH']
-     #'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
+    dow = ['AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX', 'GS', 'HD', 'HON', 'IBM', 'INTC',\
+       'JNJ', 'KO', 'JPM', 'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',\
+      'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS']
     
     other = ['AMD', 'MU', 'ABT', 'AAL', 'UAL', 'DAL', 'ANTM', 'ATVI', 'BAC', 'PNC', 'C', 'EBAY', 'AMZN', 'GOOG', 'FB', 'SNAP', 'TWTR'\
         'FDX', 'MCD', 'PEP']
     
     stocks = list(np.unique(other))
-    back = backtester(dow, predict, 3000, datetime(2019, 1, 1), datetime(2019, 1, 5), threshold = 0.9, sell_perc = 0.05, hold_till = 1,\
+    back = backtester(dow, predict, 3000, datetime(2019, 1, 1), datetime(2019, 7, 1), threshold = 0.9, sell_perc = 0.04, hold_till = 5,\
     stop_perc = 0.005)
+    #back = backtester(other, LR_v1_predict, 3000, datetime(2019, 1, 1), datetime(2019, 1, 15), threshold = 0.99, sell_perc = 0.01, hold_till = 5,\
+    #stop_perc = 0.0005)
     back.backtest()
 
     
